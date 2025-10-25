@@ -1,0 +1,2362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Analysis Suite</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000000;
+            color: #00ffaa;
+            font-family: monospace;
+            font-size: 13px;
+            margin: 0;
+            padding: 15px;
+            line-height: 1.4;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .main-header {
+            font-size: 2.2rem;
+            color: #00ffaa;
+            text-align: center;
+            text-shadow: 0 0 6px #00ffaa;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .metric-card {
+            background-color: #0a0a0a;
+            border: 1px solid #00ffaa;
+            border-radius: 0.3rem;
+            padding: 0.6rem;
+            box-shadow: 0 0 6px #00ffaa;
+            margin-bottom: 0.6rem;
+        }
+
+        .trend-uptrend, .trend-markup {
+            color: #06d6a0;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 0 0 3px #06d6a0;
+        }
+
+        .trend-downtrend, .trend-markdown {
+            color: #ef476f;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 0 0 3px #ef476f;
+        }
+
+        .trend-sideways, .trend-accumulation, .trend-distribution {
+            color: #ffd166;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 0 0 3px #ffd166;
+        }
+
+        .trend-none {
+            color: #888888;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #1f77b4;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.85rem;
+            text-shadow: 0 0 3px #1f77b4;
+            box-shadow: 0 0 6px #1f77b4;
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            background-color: #2a9df4;
+            text-shadow: 0 0 6px #2a9df4;
+        }
+
+        .info-box {
+            background-color: #0a0a0a;
+            border: 1px solid #00ffaa;
+            border-radius: 0.3rem;
+            padding: 0.6rem;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 0 6px #00ffaa;
+            width: 100%;
+        }
+
+        .signal-buy {
+            background-color: #06d6a0;
+            color: #000000;
+            padding: 0.3rem;
+            border-radius: 0.3rem;
+            margin: 0.2rem;
+            box-shadow: 0 0 3px #06d6a0;
+        }
+
+        .signal-sell {
+            background-color: #ef476f;
+            color: #ffffff;
+            padding: 0.3rem;
+            border-radius: 0.3rem;
+            margin: 0.2rem;
+            box-shadow: 0 0 3px #ef476f;
+        }
+
+        .signal-neutral {
+            background-color: #ffd166;
+            color: #000000;
+            padding: 0.3rem;
+            border-radius: 0.3rem;
+            margin: 0.2rem;
+            box-shadow: 0 0 3px #ffd166;
+        }
+
+        .confidence-high {
+            color: #06d6a0;
+            font-weight: bold;
+            text-shadow: 0 0 3px #06d6a0;
+        }
+
+        .confidence-medium {
+            color: #ffd166;
+            font-weight: bold;
+            text-shadow: 0 0 3px #ffd166;
+        }
+
+        .confidence-low {
+            color: #ef476f;
+            font-weight: bold;
+            text-shadow: 0 0 3px #ef476f;
+        }
+
+        .trade-signal {
+            background-color: #0a0a0a;
+            border: 1px solid #1f77b4;
+            color: #ffffff;
+            padding: 0.6rem;
+            border-radius: 0.3rem;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 0 6px #1f77b4;
+            width: 100%;
+        }
+
+        .fib-explanation {
+            background-color: #0a0a0a;
+            border: 1px solid #00ffaa;
+            border-radius: 0.3rem;
+            padding: 0.6rem;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 0 6px #00ffaa;
+            width: 100%;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 0.6rem;
+        }
+
+        th, td {
+            border: 1px solid #00ffaa;
+            padding: 5px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #001100;
+            color: #00ffaa;
+            text-shadow: 0 0 3px #00ffaa;
+        }
+
+        form {
+            max-width: 100%;
+            width: 75%;
+            margin: 0 auto 1rem;
+            background-color: #0a0a0a;
+            padding: 0.8rem;
+            border: 1px solid #00ffaa;
+            border-radius: 0.3rem;
+            box-shadow: 0 0 6px #00ffaa;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: #00ffaa;
+            text-shadow: 0 0 2px #00ffaa;
+            margin-bottom: 0.2rem;
+        }
+
+        select, input[type="text"], input[type="number"] {
+            background-color: #001100;
+            color: #00ffaa;
+            border: 1px solid #00ffaa;
+            padding: 0.3rem;
+            width: 100%;
+            font-size: 0.85rem;
+            box-shadow: 0 0 3px #00ffaa;
+            border-radius: 0.2rem;
+        }
+
+        select[multiple] {
+            height: 80px;
+        }
+
+        details {
+            margin-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        summary {
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #00ffaa;
+            text-shadow: 0 0 2px #00ffaa;
+            padding: 0.3rem;
+            background-color: #001100;
+            border-radius: 0.3rem;
+            width: 100%;
+        }
+
+        details[open] summary {
+            background-color: #003300;
+        }
+
+        h2, h3, h4 {
+            color: #00ffaa;
+            text-shadow: 0 0 3px #00ffaa;
+            margin: 0.4rem 0;
+            width: 100%;
+        }
+
+        p {
+            margin: 0.2rem 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        li {
+            margin-bottom: 0.2rem;
+        }
+
+        .analysis-section {
+            margin-bottom: 1.5rem;
+            padding: 0.6rem;
+            border: 1px solid #00ffaa;
+            border-radius: 0.3rem;
+            box-shadow: 0 0 6px #00ffaa;
+            width: 100%;
+        }
+
+        .degree-section {
+            margin-bottom: 1rem;
+            padding: 0.6rem;
+            border: 1px solid #1f77b4;
+            border-radius: 0.3rem;
+            box-shadow: 0 0 6px #1f77b4;
+            width: 100%;
+        }
+
+        .tab-container {
+            display: flex;
+            margin: 1rem 0 0.6rem 0;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .tab {
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            border: 1px solid #00ffaa;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+            border-radius: 0.3rem;
+            background-color: #001100;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            background-color: #00ffaa;
+            color: #000000;
+            box-shadow: 0 0 6px #00ffaa;
+        }
+
+        .tab:hover:not(.active) {
+            background-color: #003300;
+        }
+
+        .form-section {
+            padding: 0.6rem;
+            border: 1px solid #1f77b4;
+            border-radius: 0.3rem;
+            width: 100%;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            font-size: 0.85rem;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin-right: 0.3rem;
+        }
+
+        .tool-selection {
+            margin-bottom: 0.6rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .tool-checkboxes {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .tool-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .tool-checkbox input {
+            width: auto;
+        }
+
+        .results-tabs {
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .results-section {
+            display: none;
+            width: 100%;
+        }
+
+        .results-section.active {
+            display: block;
+            width: 100%;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 1rem;
+            border: 1px solid #00ffaa;
+            border-radius: 0.3rem;
+            margin: 1rem 0;
+            width: 100%;
+        }
+
+        /* FIXED CHART CONTAINER STYLES */
+        .chart-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            overflow-x: hidden;
+            margin: 0.6rem 0;
+            position: relative;
+        }
+
+        .chart-container .js-plotly-plot,
+        .chart-container .plotly-graph-div {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            height: 500px !important;
+        }
+
+        /* Ensure all chart containers have full width */
+        #fibonacci-results .chart-container,
+        #elliott-results .chart-container,
+        #ichimoku-results .chart-container,
+        #wyckoff-results .chart-container,
+        #gann-results .chart-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+        }
+
+        #fibonacci-results .js-plotly-plot,
+        #elliott-results .js-plotly-plot,
+        #ichimoku-results .js-plotly-plot,
+        #wyckoff-results .js-plotly-plot,
+        #gann-results .js-plotly-plot,
+        #fibonacci-results .plotly-graph-div,
+        #elliott-results .plotly-graph-div,
+        #ichimoku-results .plotly-graph-div,
+        #wyckoff-results .plotly-graph-div,
+        #gann-results .plotly-graph-div {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            height: 500px !important;
+        }
+
+        /* Force Plotly to use full width */
+        .js-plotly-plot .plot-container,
+        .plotly-graph-div > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+        }
+
+        .plotly-graph-div .svg-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+        }
+
+        .trade-section {
+            margin: 1rem 0;
+            width: 100%;
+        }
+
+        .trade-tabs {
+            display: flex;
+            margin-bottom: 0.6rem;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .trade-tab {
+            padding: 0.3rem 0.6rem;
+            cursor: pointer;
+            border: 1px solid #00ffaa;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+            border-radius: 0.3rem 0.3rem 0 0;
+            background-color: #001100;
+            font-size: 0.85rem;
+        }
+
+        .trade-tab.active {
+            background-color: #00ffaa;
+            color: #000000;
+        }
+
+        .trade-content {
+            display: none;
+            padding: 0.6rem;
+            border: 1px solid #00ffaa;
+            border-radius: 0 0.3rem 0.3rem 0.3rem;
+            width: 100%;
+        }
+
+        .trade-content.active {
+            display: block;
+        }
+
+        .pattern-table {
+            margin: 0.6rem 0;
+            width: 100%;
+        }
+
+        .wave-analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.6rem;
+            margin: 0.6rem 0;
+            width: 100%;
+        }
+
+        .chart-section {
+            margin-bottom: 1rem;
+            border: 1px solid #1f77b4;
+            border-radius: 0.3rem;
+            padding: 0.6rem;
+            width: 100%;
+        }
+
+        .gann-chart-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            overflow-x: hidden;
+            margin: 0.6rem 0;
+        }
+
+        .gann-chart-container .js-plotly-plot,
+        .gann-chart-container .plotly-graph-div {
+            width: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            height: 500px !important;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="main-header">📊 Trading Analysis Suite</h1>
+
+    <form method="post" id="analysis-form">
+        <details open>
+            <summary>🔧 General Settings</summary>
+            <div class="form-section">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%;">
+                    <div style="width: 100%;">
+                        <label for="symbols">Coins:</label>
+                        <select name="symbols" multiple style="width: 100%;">
+                            {% for sym in popular_symbols %}
+                            <option value="{{ sym }}" {% if sym in config.symbols %}selected{% endif %}>{{ sym }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="interval">Timeframe:</label>
+                        <select name="interval" style="width: 100%;">
+                            {% for intv in intervals %}
+                            <option value="{{ intv }}" {% if intv == config.interval %}selected{% endif %}>{{ intv }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="custom_symbols">Custom Symbols:</label>
+                        <input type="text" name="custom_symbols" value="{{ config.get('custom_symbols', '') }}" style="width: 100%;">
+                        <label for="candle_limit">Candles:</label>
+                        <input type="number" name="candle_limit" value="{{ config.candle_limit }}" min="100" max="50000" step="100" style="width: 100%;">
+                    </div>
+                </div>
+                <!-- New: Enable Buy/Sell Signals -->
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="enable_buy" {% if config.get('enable_buy', True) %}checked{% endif %}> Enable Buy Signals</label>
+                    <label><input type="checkbox" name="enable_sell" {% if config.get('enable_sell', False) %}checked{% endif %}> Enable Sell Signals</label>
+                </div>
+            </div>
+        </details>
+
+        <details open>
+            <summary>Analysis Tools</summary>
+            <div class="tool-selection">
+                <div class="tool-checkboxes">
+                    <div class="tool-checkbox"><input type="checkbox" id="fibonacci_tool" name="tools" value="fibonacci" {% if 'fibonacci' in config.selected_tools %}checked{% endif %}><label for="fibonacci_tool">Fibonacci</label></div>
+                    <div class="tool-checkbox"><input type="checkbox" id="elliott_tool" name="tools" value="elliott" {% if 'elliott' in config.selected_tools %}checked{% endif %}><label for="elliott_tool">Elliott</label></div>
+                    <div class="tool-checkbox"><input type="checkbox" id="ichimoku_tool" name="tools" value="ichimoku" {% if 'ichimoku' in config.selected_tools %}checked{% endif %}><label for="ichimoku_tool">Ichimoku</label></div>
+                    <div class="tool-checkbox"><input type="checkbox" id="wyckoff_tool" name="tools" value="wyckoff" {% if 'wyckoff' in config.selected_tools %}checked{% endif %}><label for="wyckoff_tool">Wyckoff</label></div>
+                    <div class="tool-checkbox"><input type="checkbox" id="gann_tool" name="tools" value="gann" {% if 'gann' in config.selected_tools %}checked{% endif %}><label for="gann_tool">Gann</label></div>
+                </div>
+            </div>
+        </details>
+        <details open>
+            <summary>💰 Budget Settings</summary>
+            <div class="form-section">
+                <label for="total_budget">Total Budget (USD):</label>
+                <input type="number" id="total_budget" name="total_budget" value="{{ budget.get('total_budget', 5000.0) }}" min="100" max="100000" step="100" style="width: 100%;">
+                
+                
+                <!-- Budget Status Display -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.6rem; width: 100%; margin-top: 0.6rem;">
+                    <div class="metric-card">
+                        <h4>Total Budget</h4>
+                        <p>$<span id="total_budget_display">{{ "%.2f"|format(budget.get('total_budget', 5000.0)) }}</span></p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Used</h4>
+                        <p>$<span id="used_budget_display">{{ "%.2f"|format(budget.get('used_budget', 0.0)) }}</span></p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Remaining</h4>
+                        <p>$<span id="remaining_budget_display">{{ "%.2f"|format(budget.get('remaining_budget', 5000.0)) }}</span></p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Total Fees</h4>
+                        <p>$<span id="total_fees_display">{{ "%.2f"|format(budget.get('total_fees', 0.0)) }}</span></p>
+                    </div>
+                </div>
+            </div>
+        </details>
+        <details>
+            <summary>🔗 Combined Analysis Settings</summary>
+            <div class="form-section">
+                <label for="confidence_threshold">Minimum Confidence Threshold:</label>
+                <input type="number" name="confidence_threshold" value="{{ combined_settings.confidence_threshold }}" min="0.0" max="1.0" step="0.1" style="width: 100%;">
+                
+                <label for="min_tool_agreement">Minimum Tool Agreement:</label>
+                <input type="number" name="min_tool_agreement" value="{{ combined_settings.min_tool_agreement }}" min="2" max="5" step="1" style="width: 100%;">
+                
+                <label for="risk_reward_ratio">Risk-Reward Ratio:</label>
+                <select name="risk_reward_ratio" style="width: 100%;">
+                    <option value="1:1" {% if combined_settings.risk_reward_ratio == '1:1' %}selected{% endif %}>1:1</option>
+                    <option value="1:1.5" {% if combined_settings.risk_reward_ratio == '1:1.5' %}selected{% endif %}>1:1.5</option>
+                    <option value="1:2" {% if combined_settings.risk_reward_ratio == '1:2' %}selected{% endif %}>1:2</option>
+                    <option value="1:2.5" {% if combined_settings.risk_reward_ratio == '1:2.5' %}selected{% endif %}>1:2.5</option>
+                    <option value="1:3" {% if combined_settings.risk_reward_ratio == '1:3' %}selected{% endif %}>1:3</option>
+                </select>
+                
+                <h4>Tool Weights:</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%;">
+                    <div style="width: 100%;">
+                        <label for="fibonacci_weight">Fibonacci Weight:</label>
+                        <input type="number" name="fibonacci_weight" value="{{ combined_settings.tool_weights.fibonacci }}" min="0.1" max="2.0" step="0.1" style="width: 100%;">
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="elliott_weight">Elliott Weight:</label>
+                        <input type="number" name="elliott_weight" value="{{ combined_settings.tool_weights.elliott }}" min="0.1" max="2.0" step="0.1" style="width: 100%;">
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="ichimoku_weight">Ichimoku Weight:</label>
+                        <input type="number" name="ichimoku_weight" value="{{ combined_settings.tool_weights.ichimoku }}" min="0.1" max="2.0" step="0.1" style="width: 100%;">
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="wyckoff_weight">Wyckoff Weight:</label>
+                        <input type="number" name="wyckoff_weight" value="{{ combined_settings.tool_weights.wyckoff }}" min="0.1" max="2.0" step="0.1" style="width: 100%;">
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="gann_weight">Gann Weight:</label>
+                        <input type="number" name="gann_weight" value="{{ combined_settings.tool_weights.gann }}" min="0.1" max="2.0" step="0.1" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>📊 Fibonacci Settings</summary>
+            <div id="fibonacci-form" class="form-section">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; width: 100%;">
+                    <div style="width: 100%;">
+                        <label for="window">Window Size:</label>
+                        <input type="number" name="window" value="{{ config.fib_window }}" min="10" max="50000" step="10" style="width: 100%;">
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="fib_threshold">Threshold (%):</label>
+                        <input type="number" name="fib_threshold" value="{{ config.fib_threshold * 100 }}" min="0.1" max="5.0" step="0.1" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>📈 Elliott Wave Settings</summary>
+            <div id="elliott-form" class="form-section">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; width: 100%;">
+                    <div style="width: 100%;">
+                        <label for="minor_threshold">Minor (%):</label>
+                        <input type="number" name="minor_threshold" value="{{ config.elliott_thresholds.Minor * 100 }}" min="0.1" max="10.0" step="0.1" style="width: 100%;">
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="intermediate_threshold">Intermediate (%):</label>
+                        <input type="number" name="intermediate_threshold" value="{{ config.elliott_thresholds.Intermediate * 100 }}" min="0.1" max="10.0" step="0.1" style="width: 100%;">
+                    </div>
+                    <div style="width: 100%;">
+                        <label for="major_threshold">Major (%):</label>
+                        <input type="number" name="major_threshold" value="{{ config.elliott_thresholds.Major * 100 }}" min="0.1" max="10.0" step="0.1" style="width: 100%;">
+                    </div>
+                </div>
+                <label>Wave Degrees:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="elliott_degrees" value="Minor" {% if 'Minor' in config.elliott_degrees %}checked{% endif %}> Minor</label>
+                    <label><input type="checkbox" name="elliott_degrees" value="Intermediate" {% if 'Intermediate' in config.elliott_degrees %}checked{% endif %}> Intermediate</label>
+                    <label><input type="checkbox" name="elliott_degrees" value="Major" {% if 'Major' in config.elliott_degrees %}checked{% endif %}> Major</label>
+                </div>
+                <div class="auto-refresh-container">
+                    <input type="checkbox" name="use_smoothing" id="use_smoothing" {% if config.use_smoothing %}checked{% endif %}>
+                    <label for="use_smoothing">Smooth with EMA</label>
+                </div>
+                <div id="smooth-period-container">
+                    <label for="smooth_period">EMA Period:</label>
+                    <input type="number" name="smooth_period" value="{{ config.smooth_period }}" min="2" max="5" style="width: 100%;">
+                </div>
+                <label>Display:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="show_ema" {% if config.show_ema %}checked{% endif %}> EMA</label>
+                    <label><input type="checkbox" name="show_bb" {% if config.show_bb %}checked{% endif %}> Bollinger</label>
+                    <label><input type="checkbox" name="show_volume" {% if config.show_volume %}checked{% endif %}> Volume</label>
+                    <label><input type="checkbox" name="show_rsi" {% if config.show_rsi %}checked{% endif %}> RSI</label>
+                    <label><input type="checkbox" name="show_macd" {% if config.show_macd %}checked{% endif %}> MACD</label>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>☁️ Ichimoku Settings</summary>
+            <div id="ichimoku-form" class="form-section">
+                <label>Display:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="show_ema_ichimoku" {% if config.show_ema_ichimoku %}checked{% endif %}> EMA</label>
+                    <label><input type="checkbox" name="show_bb_ichimoku" {% if config.show_bb_ichimoku %}checked{% endif %}> Bollinger</label>
+                    <label><input type="checkbox" name="show_volume_ichimoku" {% if config.show_volume_ichimoku %}checked{% endif %}> Volume</label>
+                    <label><input type="checkbox" name="show_rsi_ichimoku" {% if config.show_rsi_ichimoku %}checked{% endif %}> RSI</label>
+                    <label><input type="checkbox" name="show_macd_ichimoku" {% if config.show_macd_ichimoku %}checked{% endif %}> MACD</label>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>📊 Wyckoff Settings</summary>
+            <div id="wyckoff-form" class="form-section">
+                <label>Display:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="show_ema_wyckoff" {% if config.show_ema_wyckoff %}checked{% endif %}> EMA</label>
+                    <label><input type="checkbox" name="show_bb_wyckoff" {% if config.show_bb_wyckoff %}checked{% endif %}> Bollinger</label>
+                    <label><input type="checkbox" name="show_volume_wyckoff" {% if config.show_volume_wyckoff %}checked{% endif %}> Volume</label>
+                    <label><input type="checkbox" name="show_rsi_wyckoff" {% if config.show_rsi_wyckoff %}checked{% endif %}> RSI</label>
+                    <label><input type="checkbox" name="show_macd_wyckoff" {% if config.show_macd_wyckoff %}checked{% endif %}> MACD</label>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>📐 Gann Settings</summary>
+            <div id="gann-form" class="form-section">
+                <label>Gann Tools:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="gann_subtools" value="Gann Fan" {% if 'Gann Fan' in config.gann_subtools %}checked{% endif %}> Gann Fan</label>
+                    <label><input type="checkbox" name="gann_subtools" value="Gann Square" {% if 'Gann Square' in config.gann_subtools %}checked{% endif %}> Gann Square</label>
+                    <label><input type="checkbox" name="gann_subtools" value="Gann Box" {% if 'Gann Box' in config.gann_subtools %}checked{% endif %}> Gann Box</label>
+                    <label><input type="checkbox" name="gann_subtools" value="Gann Square Fixed" {% if 'Gann Square Fixed' in config.gann_subtools %}checked{% endif %}> Gann Square Fixed</label>
+                </div>
+                <label for="pivot_choice">Pivot Point:</label>
+                <select name="pivot_choice" style="width: 100%;">
+                    <option value="Auto (based on trend)" {% if config.pivot_choice == 'Auto (based on trend)' %}selected{% endif %}>Auto</option>
+                    <option value="Latest Pivot Low" {% if config.pivot_choice == 'Latest Pivot Low' %}selected{% endif %}>Pivot Low</option>
+                    <option value="Latest Pivot High" {% if config.pivot_choice == 'Latest Pivot High' %}selected{% endif %}>Pivot High</option>
+                </select>
+                <label>Display:</label>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="show_ema_gann" {% if config.show_ema_gann %}checked{% endif %}> EMA</label>
+                    <label><input type="checkbox" name="show_bb_gann" {% if config.show_bb_gann %}checked{% endif %}> Bollinger</label>
+                    <label><input type="checkbox" name="show_volume_gann" {% if config.show_volume_gann %}checked{% endif %}> Volume</label>
+                    <label><input type="checkbox" name="show_rsi_gann" {% if config.show_rsi_gann %}checked{% endif %}> RSI</label>
+                    <label><input type="checkbox" name="show_macd_gann" {% if config.show_macd_gann %}checked{% endif %}> MACD</label>
+                </div>
+            </div>
+        </details>
+
+        <button type="submit">🚀 Run Analysis</button>
+    </form>
+   <button onclick="refreshAllData()" style="width: 75%; margin: 1rem auto; display: block;">🔄 Refresh Data</button>
+        <!-- Selected Coins Display -->
+    <div class="info-box" style="margin: 1rem 0;">
+        <h3>🎯 Selected Coins for Analysis</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+            {% for symbol in selected_symbols %}
+            <span style="background-color: #001100; padding: 0.3rem 0.6rem; border-radius: 0.3rem; border: 1px solid #00ffaa;">
+                {{ symbol }}
+            </span>
+            {% endfor %}
+        </div>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #88ffaa;">
+            Total: {{ selected_symbols|length }} coin{{ 's' if selected_symbols|length != 1 else '' }} selected
+        </p>
+    </div>
+
+    <!-- Trade History Files Display -->
+    {% if trade_history_files %}
+    <div class="info-box" style="margin: 1rem 0;">
+        <h3>📁 Trade History Files</h3>
+        <div style="max-height: 150px; overflow-y: auto; margin-top: 0.5rem;">
+            {% for file in trade_history_files %}
+            <div style="padding: 0.3rem; border-bottom: 1px solid #003300; font-size: 0.8rem;">
+                {{ file.split('/')[-1] }}
+            </div>
+            {% endfor %}
+        </div>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #88ffaa;">
+            Total: {{ trade_history_files|length }} day{{ 's' if trade_history_files|length != 1 else '' }} of trade history
+        </p>
+    </div>
+    {% endif %}
+
+    {% if fibonacci_analyses or elliott_analyses or ichimoku_analyses or wyckoff_analyses or gann_analyses or combined_analyses %}
+    <div class="results-tabs">
+        <div class="tab-container">
+            {% if combined_analyses %}
+            <div class="tab {% if combined_analyses %}active{% endif %}" onclick="switchResultsTab('combined')">Combined ({{ combined_analyses|length }})</div>
+            {% endif %}
+            {% if fibonacci_analyses %}
+            <div class="tab active" onclick="switchResultsTab('fibonacci')">Fibonacci ({{ fibonacci_analyses|length }})</div>
+            {% endif %}
+            {% if elliott_analyses %}
+            <div class="tab {% if not fibonacci_analyses %}active{% endif %}" onclick="switchResultsTab('elliott')">Elliott ({{ elliott_analyses|length }})</div>
+            {% endif %}
+            {% if ichimoku_analyses %}
+            <div class="tab {% if not fibonacci_analyses and not elliott_analyses %}active{% endif %}" onclick="switchResultsTab('ichimoku')">Ichimoku ({{ ichimoku_analyses|length }})</div>
+            {% endif %}
+            {% if wyckoff_analyses %}
+            <div class="tab {% if not fibonacci_analyses and not elliott_analyses and not ichimoku_analyses %}active{% endif %}" onclick="switchResultsTab('wyckoff')">Wyckoff ({{ wyckoff_analyses|length }})</div>
+            {% endif %}
+            {% if gann_analyses %}
+            <div class="tab {% if not fibonacci_analyses and not elliott_analyses and not ichimoku_analyses and not wyckoff_analyses %}active{% endif %}" onclick="switchResultsTab('gann')">Gann ({{ gann_analyses|length }})</div>
+            {% endif %}
+        </div>
+         
+         <!-- Combined Results Section -->
+        {% if combined_analyses %}
+        <div id="combined-results" class="results-section active">
+            <h2>🔗 Combined Analysis Results</h2>
+            {% for symbol, analysis in combined_analyses.items() %}
+            <div class="analysis-section">
+                <h2>{{ symbol }} - Combined Signal</h2>
+                
+                <!-- Combined Signal Card -->
+                <div class="trade-signal">
+                    <h3>🎯 Combined Signal: 
+                        <span class="{% if analysis.action == 'BUY' %}signal-buy{% elif analysis.action == 'SELL' %}signal-sell{% else %}signal-neutral{% endif %}">
+                            {{ analysis.action }}
+                        </span>
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                        <div class="metric-card">
+                            <h4>Confidence</h4>
+                            <span class="confidence-{{ analysis.confidence.lower() if analysis.confidence is string else 'medium' }}">
+                                {{ analysis.confidence }}
+                            </span>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Position Size</h4>
+                            <p>{{ analysis.position_size | round(1) }}%</p>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Agreement</h4>
+                            <span class="confidence-{{ analysis.agreement_level }}">{{ analysis.agreement_level.upper() }}</span>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Risk-Reward</h4>
+                            <p>{{ analysis.risk_reward_ratio }}:1</p>
+                        </div>
+                    </div>
+                    
+                   <!-- In the combined results section, a-->
+                    {% if analysis.action in ['BUY', 'SELL'] %}
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; width: 100%; margin-top: 0.6rem;">
+                        <div class="metric-card">
+                            <h4>Entry Price</h4>
+                            <p>{{ analysis.entry_price | round(4) }}</p>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Stop Loss</h4>
+                            <p>{{ analysis.stop_loss | round(4) }}</p>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Take Profit</h4>
+                            <p>{{ analysis.take_profit | round(4) }}</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="info-box">
+                        <p><strong>HOLD Signal:</strong> No trade will be opened. Waiting for better entry conditions.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Tool Breakdown -->
+                <h3>📊 Tool Breakdown</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h4>Buy Signals</h4>
+                        <p>{{ analysis.tool_breakdown.buy_count }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Sell Signals</h4>
+                        <p>{{ analysis.tool_breakdown.sell_count }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Hold Signals</h4>
+                        <p>{{ analysis.tool_breakdown.hold_count }}</p>
+                    </div>
+                </div>
+
+                <!-- Individual Tool Signals -->
+                <h3>🔧 Individual Tool Analysis</h3>
+                
+                <!-- Buy Signals -->
+                {% if analysis.tool_breakdown.buy_signals %}
+                <h4>🟢 Buy Signals</h4>
+                {% for signal in analysis.tool_breakdown.buy_signals %}
+                <div class="metric-card" style="border-left: 4px solid #06d6a0;">
+                    <h5>{{ signal.tool | upper }} (Weight: {{ signal.weight }}x)</h5>
+                    <p><strong>Confidence:</strong> 
+                        <span class="confidence-{{ signal.confidence_original.lower() if signal.confidence_original is string else 'medium' }}">
+                            {{ signal.confidence_original }}
+                        </span>
+                    </p>
+                    <p><strong>Reason:</strong> {{ signal.reason }}</p>
+                    {% if signal.entry_price %}
+                    <p><strong>Entry:</strong> {{ signal.entry_price | round(4) }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <!-- Sell Signals -->
+                {% if analysis.tool_breakdown.sell_signals %}
+                <h4>🔴 Sell Signals</h4>
+                {% for signal in analysis.tool_breakdown.sell_signals %}
+                <div class="metric-card" style="border-left: 4px solid #ef476f;">
+                    <h5>{{ signal.tool | upper }} (Weight: {{ signal.weight }}x)</h5>
+                    <p><strong>Confidence:</strong> 
+                        <span class="confidence-{{ signal.confidence_original.lower() if signal.confidence_original is string else 'medium' }}">
+                            {{ signal.confidence_original }}
+                        </span>
+                    </p>
+                    <p><strong>Reason:</strong> {{ signal.reason }}</p>
+                    {% if signal.entry_price %}
+                    <p><strong>Entry:</strong> {{ signal.entry_price | round(4) }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <!-- Hold Signals -->
+                {% if analysis.tool_breakdown.hold_signals %}
+                <h4>🟡 Hold Signals</h4>
+                {% for signal in analysis.tool_breakdown.hold_signals %}
+                <div class="metric-card" style="border-left: 4px solid #ffd166;">
+                    <h5>{{ signal.tool | upper }} (Weight: {{ signal.weight }}x)</h5>
+                    <p><strong>Confidence:</strong> 
+                        <span class="confidence-{{ signal.confidence_original.lower() if signal.confidence_original is string else 'medium' }}">
+                            {{ signal.confidence_original }}
+                        </span>
+                    </p>
+                    <p><strong>Reason:</strong> {{ signal.reason }}</p>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <!-- Decision Reasons -->
+                <h3>📝 Decision Factors</h3>
+                <div class="info-box">
+                    <ul>
+                        {% for reason in analysis.reasons %}
+                        <li>{{ reason }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if fibonacci_analyses %}
+        <div id="fibonacci-results" class="results-section {% if fibonacci_analyses %}active{% endif %}">
+            <h2>Fibonacci Results</h2>
+            {% for analysis in fibonacci_analyses %}
+            <div class="analysis-section">
+                <h2>{{ analysis.symbol }} ({{ analysis.interval }})</h2>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h3>Price</h3>
+                        <p class="current-price" data-symbol="{{ analysis.symbol }}" data-tool="fibonacci" data-tool="fibonacci">{{ analysis.current_price | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Swing High</h3>
+                        <p>{{ analysis.swing_high | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Swing Low</h3>
+                        <p>{{ analysis.swing_low | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Trend</h3>
+                        <span class="{{ analysis.trend_class }}">{{ analysis.trend.upper() }}</span>
+                    </div>
+                </div>
+                <h3>📈 Signals</h3>
+                {% if analysis.signals %}
+                    <p>Confidence: <span class="{% if analysis.confidence is defined %}{{ analysis.confidence_class }}{% else %}confidence-low{% endif %}">
+                        {% if analysis.confidence is defined %}{{ (analysis.confidence * 100) | round(0) }}%{% else %}N/A{% endif %}
+                    </span></p>
+                    {% if analysis.entry_price and analysis.stop_loss and analysis.take_profit and analysis.trade_action %}
+                        <div class="trade-signal">
+                            <h4>{{ analysis.trade_action }} Trade</h4>
+                            <p><strong>Entry:</strong> {{ analysis.entry_price | round(4) }}</p>
+                            <p><strong>Stop Loss:</strong> {{ analysis.stop_loss | round(4) }}</p>
+                            <p><strong>Take Profit:</strong> {{ analysis.take_profit | round(4) }}</p>
+                            <p><strong>Risk/Reward:</strong> {{ analysis.risk_reward_ratio | round(2) }}:1</p>
+                        </div>
+                    {% else %}
+                        <p>No trade setup. Conflicting signals.</p>
+                    {% endif %}
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; width: 100%;">
+                        {% for sig, desc in zip(analysis.signals, analysis.signal_descriptions) %}
+                        <div style="width: 100%;">
+                            <div class="signal-{{ sig[1] | lower }}">{{ sig[0] }}</div>
+                            <p>{{ desc }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>No signals detected.</p>
+                {% endif %}
+                <p>Last Candle (UTC): {{ analysis.last_candle }} | Data: {{ analysis.data_from }} to {{ analysis.data_to }}</p>
+                <div class="chart-container">
+                    {{ analysis.chart_html | safe }}
+                </div>
+                <h3>📊 Support & Resistance</h3>
+                {% if analysis.fib_html %}
+                    {{ analysis.fib_html | safe }}
+                    <p class="info-box">{{ analysis.closest_info }}</p>
+                    {{ analysis.fib_explanation | safe }}
+                {% else %}
+                    <p class="info-box">{{ analysis.closest_info }}</p>
+                {% endif %}
+                <h3>📈 Indicators</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h4>RSI</h4>
+                        <p>{{ analysis.rsi_value | round(2) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>EMA (20)</h4>
+                        <p>{{ analysis.ema_value | round(4) }}</p>
+                        <p>Price is {{ analysis.ema_rel }} EMA</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>ATR</h4>
+                        <p>{{ analysis.atr_value | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>BB %B</h4>
+                        <p>{{ analysis.bb_value | round(2) }}%</p>
+                        <p>{{ analysis.bb_status }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if elliott_analyses %}
+        <div id="elliott-results" class="results-section {% if not fibonacci_analyses %}active{% endif %}">
+            <h2>Elliott Wave Results</h2>
+            {% for symbol, analysis in elliott_analyses.items() %}
+            <div class="analysis-section">
+                <h2>{{ symbol }} ({{ analysis.interval }})</h2>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h3>Price</h3>
+                        <p class="current-price" data-symbol="{{ symbol }}" data-tool="elliott" data-tool="elliott">{{ analysis.current_price | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>RSI</h3>
+                        <p>{{ analysis.technical_indicators.rsi | round(2) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>EMA (20)</h3>
+                        <p>{{ analysis.technical_indicators.ema | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>BB %B</h3>
+                        <p>{{ analysis.technical_indicators.bb_percent | round(2) }}%</p>
+                    </div>
+                </div>
+                {% for degree, wave_data in analysis.wave_data_by_degree.items() %}
+                <div class="degree-section">
+                    <h3>{{ degree }} Degree</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; width: 100%;">
+                        <div class="metric-card">
+                            <h4>Confidence</h4>
+                            <span class="confidence-{{ wave_data.confidence }}">{{ wave_data.confidence.upper() }}</span>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Direction</h4>
+                            <span class="trend-{{ wave_data.direction }}">{{ wave_data.direction.upper() }}</span>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Patterns</h4>
+                            <p>{{ wave_data.historical_patterns | length }}</p>
+                        </div>
+                    </div>
+                    {% if wave_data.historical_patterns %}
+                        <h4>Recent Pattern</h4>
+                        {% set recent_pattern = wave_data.historical_patterns[-1] %}
+                        <div class="wave-analysis-grid">
+                            <div class="metric-card">
+                                <h5>Impulse Waves</h5>
+                                <table class="pattern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Wave</th>
+                                            <th>Price</th>
+                                            <th>Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for label in ['0', '1', '2', '3', '4', '5'] %}
+                                        {% if label in recent_pattern.impulse %}
+                                        {% set wave = recent_pattern.impulse[label] %}
+                                        <tr>
+                                            <td>{{ label }}</td>
+                                            <td>{{ wave.price | round(4) }}</td>
+                                            <td>{{ wave.type }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% if recent_pattern.abc %}
+                            <div class="metric-card">
+                                <h5>ABC Correction</h5>
+                                <table class="pattern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Wave</th>
+                                            <th>Price</th>
+                                            <th>Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for label in ['A', 'B', 'C'] %}
+                                        {% if label in recent_pattern.abc %}
+                                        {% set wave = recent_pattern.abc[label] %}
+                                        <tr>
+                                            <td>{{ label }}</td>
+                                            <td>{{ wave.price | round(4) }}</td>
+                                            <td>{{ wave.type }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if recent_pattern.fib_impulse %}
+                        <div class="metric-card">
+                            <h5>Fibonacci Analysis</h5>
+                            <table class="pattern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for metric, value in recent_pattern.fib_impulse.items() %}
+                                    <tr>
+                                        <td>{{ metric }}</td>
+                                        <td>{{ value | round(3) }}</td>
+                                        <td>
+                                            {% if metric == 'Wave 2 Retrace' %}
+                                                {% if 0.382 <= value <= 0.618 %}
+                                                <span class="confidence-high">Ideal</span>
+                                                {% elif 0.236 <= value <= 0.786 %}
+                                                <span class="confidence-medium">Acceptable</span>
+                                                {% else %}
+                                                <span class="confidence-low">Weak</span>
+                                                {% endif %}
+                                            {% elif metric == 'Wave 3 Extension' %}
+                                                {% if 1.0 <= value <= 2.618 %}
+                                                    {% set diff = (value - 1.618) %}
+                                                    {% if diff >= -0.3 and diff <= 0.3 %}
+                                                    <span class="confidence-high">Ideal</span>
+                                                    {% else %}
+                                                    <span class="confidence-medium">Acceptable</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                <span class="confidence-low">Weak</span>
+                                                {% endif %}
+                                            {% elif metric == 'Wave 4 Retrace' %}
+                                                {% if 0.236 <= value <= 0.382 %}
+                                                <span class="confidence-high">Ideal</span>
+                                                {% else %}
+                                                <span class="confidence-medium">Acceptable</span>
+                                                {% endif %}
+                                            {% elif metric == 'Wave 5 Extension' %}
+                                                {% set diff1 = (value - 1.0) %}
+                                                {% set diff2 = (value - 0.618) %}
+                                                {% set diff3 = (value - 1.618) %}
+                                                {% if (diff1 >= -0.2 and diff1 <= 0.2) or (diff2 >= -0.2 and diff2 <= 0.2) or (diff3 >= -0.2 and diff3 <= 0.2) %}
+                                                <span class="confidence-high">Ideal</span>
+                                                {% else %}
+                                                <span class="confidence-medium">Acceptable</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                        {% if recent_pattern.fib_abc %}
+                        <div class="metric-card">
+                            <h5>ABC Fibonacci</h5>
+                            <table class="pattern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for metric, value in recent_pattern.fib_abc.items() %}
+                                    <tr>
+                                        <td>{{ metric }}</td>
+                                        <td>{{ value | round(3) }}</td>
+                                        <td>
+                                            {% if metric == 'B Retrace' %}
+                                                {% if 0.382 <= value <= 0.786 %}
+                                                <span class="confidence-high">Ideal</span>
+                                                {% else %}
+                                                <span class="confidence-medium">Acceptable</span>
+                                                {% endif %}
+                                            {% elif metric == 'C Extension' %}
+                                                {% set diff1 = (value - 1.0) %}
+                                                {% set diff2 = (value - 1.618) %}
+                                                {% if (diff1 >= -0.2 and diff1 <= 0.2) or (diff2 >= -0.2 and diff2 <= 0.2) %}
+                                                <span class="confidence-high">Ideal</span>
+                                                {% else %}
+                                                <span class="confidence-medium">Acceptable</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    {% if wave_data.partial_waves %}
+                        <h4>Current Pattern</h4>
+                        <div class="metric-card">
+                            <table class="pattern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Wave</th>
+                                        <th>Price</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for label in ['0?', '1?', '2?', '3?', '4?'] %}
+                                    {% if label in wave_data.partial_waves %}
+                                    {% set wave = wave_data.partial_waves[label] %}
+                                    <tr>
+                                        <td>{{ label }}</td>
+                                        <td>{{ wave.price | round(4) }}</td>
+                                        <td>{{ wave.type }}</td>
+                                        <td>
+                                            {% if '?' in label %}
+                                            <span class="confidence-medium">Unconfirmed</span>
+                                            {% else %}
+                                            <span class="confidence-high">Confirmed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if wave_data.fib_partial %}
+                        <div class="metric-card">
+                            <h5>Partial Fibonacci</h5>
+                            <table class="pattern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for metric, value in wave_data.fib_partial.items() %}
+                                    <tr>
+                                        <td>{{ metric }}</td>
+                                        <td>{{ value | round(3) }}</td>
+                                        <td>
+                                            {% if metric == 'Wave 2 Retrace' %}
+                                                {% if 0.382 <= value <= 0.618 %}
+                                                <span class="confidence-high">Ideal</span>
+                                                {% elif 0.236 <= value <= 0.786 %}
+                                                <span class="confidence-medium">Acceptable</span>
+                                                {% else %}
+                                                <span class="confidence-low">Weak</span>
+                                                {% endif %}
+                                            {% elif metric == 'Wave 3 Extension' %}
+                                                {% if 1.0 <= value <= 2.618 %}
+                                                    {% set diff = (value - 1.618) %}
+                                                    {% if diff >= -0.3 and diff <= 0.3 %}
+                                                    <span class="confidence-high">Ideal</span>
+                                                    {% else %}
+                                                    <span class="confidence-medium">Acceptable</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                <span class="confidence-low">Weak</span>
+                                                {% endif %}
+                                            {% elif metric == 'Wave 4 Retrace' %}
+                                                {% if 0.236 <= value <= 0.382 %}
+                                                <span class="confidence-high">Ideal</span>
+                                                {% else %}
+                                                <span class="confidence-medium">Acceptable</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    <h4>🎯 Signals</h4>
+                    {% if wave_data.signals %}
+                        {% for signal in wave_data.signals %}
+                        <div class="trade-signal" data-symbol="{{ symbol }}" data-tool="elliott" data-degree="{{ degree }}">
+                            <h5>{{ signal.type }} Signal</h5>
+                            <p><strong>Reason:</strong> {{ signal.reason }}</p>
+                            <p><strong>Entry:</strong> {{ signal.entry_price | round(4) }}</p>
+                            <p><strong>Stop Loss:</strong> {{ signal.sl | round(4) }}</p>
+                            <p><strong>Take Profit:</strong> {{ signal.tp | round(4) }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="info-box">No signals for {{ degree }}.</p>
+                    {% endif %}
+                    <div class="chart-container">
+                        {{ analysis.charts[degree] | safe }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if ichimoku_analyses %}
+        <div id="ichimoku-results" class="results-section {% if not fibonacci_analyses and not elliott_analyses %}active{% endif %}">
+            <h2>Ichimoku Results</h2>
+            {% for symbol, analysis in ichimoku_analyses.items() %}
+            <div class="analysis-section">
+                <h2>{{ symbol }} ({{ analysis.interval }})</h2>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h3>Price</h3>
+                        <p class="current-price" data-symbol="{{ symbol }}" data-tool="ichimoku" data-tool="ichimoku">{{ analysis.current_price | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Trend</h3>
+                        <span class="trend-{{ analysis['trend'] if analysis['trend'] is defined else 'none' }}">{{ analysis['trend'].upper() if analysis['trend'] is defined else 'N/A' }}</span>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Confidence</h3>
+                        <span class="confidence-{{ analysis['confidence'] if analysis['confidence'] is defined else 'low' }}">
+                            {{ analysis['confidence'].upper() if analysis['confidence'] is defined else 'N/A' }}
+                        </span>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Cloud</h3>
+                        <span class="{% if analysis.cloud_bullish is defined and analysis.cloud_bullish %}trend-uptrend{% else %}trend-downtrend{% endif %}">
+                            {{ 'Bullish' if analysis.cloud_bullish is defined and analysis.cloud_bullish else 'Bearish' }}
+                        </span>
+                    </div>
+                </div>
+                <h3>📊 Ichimoku Values</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h4>Tenkan-sen</h4>
+                        <p>{{ analysis.technical_indicators.tenkan_sen | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Kijun-sen</h4>
+                        <p>{{ analysis.technical_indicators.kijun_sen | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Senkou Span A</h4>
+                        <p>{{ analysis.technical_indicators.senkou_span_a | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Senkou Span B</h4>
+                        <p>{{ analysis.technical_indicators.senkou_span_b | round(4) }}</p>
+                    </div>
+                </div>
+                <h3>🎯 Signals</h3>
+                {% if analysis.signals %}
+                    {% for signal in analysis.signals %}
+                    <div class="trade-signal" data-symbol="{{ symbol }}" data-tool="ichimoku">
+                        <h4>{{ signal.type }} Signal</h4>
+                        <p><strong>Reason:</strong> {{ signal.reason }}</p>
+                        <p><strong>Entry:</strong> {{ signal.entry_price | round(4) }}</p>
+                        <p><strong>Stop Loss:</strong> {{ signal.sl | round(4) }}</p>
+                        <p><strong>Take Profit:</strong> {{ signal.tp | round(4) }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="info-box">No signals.</p>
+                    {% if analysis.reasons_not_met %}
+                    <div class="info-box">
+                        <h4>Reasons not met:</h4>
+                        <ul>
+                            {% for reason in analysis.reasons_not_met %}
+                            <li>{{ reason }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                <div class="chart-container">
+                    {{ analysis.chart_html | safe }}
+                </div>
+                <h3>📈 Indicators</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h4>RSI</h4>
+                        <p>{{ analysis.technical_indicators.rsi | round(2) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>EMA (20)</h4>
+                        <p>{{ analysis.technical_indicators.ema | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>ATR</h4>
+                        <p>{{ analysis.technical_indicators.atr | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>BB %B</h4>
+                        <p>{{ analysis.technical_indicators.bb_percent | round(2) }}%</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if wyckoff_analyses %}
+        <div id="wyckoff-results" class="results-section {% if not fibonacci_analyses and not elliott_analyses and not ichimoku_analyses %}active{% endif %}">
+            <h2>Wyckoff Results</h2>
+            {% for symbol, analysis in wyckoff_analyses.items() %}
+            <div class="analysis-section">
+                <h2>{{ symbol }} ({{ analysis.interval }})</h2>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h3>Price</h3>
+                        <p class="current-price" data-symbol="{{ symbol }}" data-tool="wyckoff" data-tool="wyckoff">{{ analysis.current_price | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Phase</h3>
+                        <span class="trend-{{ analysis['phase'] if analysis['phase'] is defined else 'none' }}">{{ analysis['phase'].upper() if analysis['phase'] is defined else 'N/A' }}</span>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Confidence</h3>
+                        <span class="confidence-{{ analysis['confidence'] if analysis['confidence'] is defined else 'low' }}">
+                            {{ analysis['confidence'].upper() if analysis['confidence'] is defined else 'N/A' }}
+                        </span>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Sideways Count</h3>
+                        <p>{{ analysis.sideways_count if analysis.sideways_count is defined else 'N/A' }}</p>
+                    </div>
+                </div>
+                <h3>📊 Wyckoff Values</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h4>Support</h4>
+                        <p>{{ analysis.technical_indicators.support | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Resistance</h4>
+                        <p>{{ analysis.technical_indicators.resistance | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>EMA (20)</h4>
+                        <p>{{ analysis.technical_indicators.ema_short | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>EMA (50)</h4>
+                        <p>{{ analysis.technical_indicators.ema_long | round(4) }}</p>
+                    </div>
+                </div>
+                <h3>🎯 Signals</h3>
+                {% if analysis.signals %}
+                    {% for signal in analysis.signals %}
+                    <div class="trade-signal" data-symbol="{{ symbol }}" data-tool="wyckoff">
+                        <h4>{{ signal.type }} Signal</h4>
+                        <p><strong>Reason:</strong> {{ signal.reason }}</p>
+                        <p><strong>Entry:</strong> {{ signal.entry_price | round(4) }}</p>
+                        <p><strong>Stop Loss:</strong> {{ signal.sl | round(4) }}</p>
+                        <p><strong>Take Profit:</strong> {{ signal.tp | round(4) }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="info-box">No signals.</p>
+                    {% if analysis.reasons_not_met %}
+                    <div class="info-box">
+                        <h4>Reasons not met:</h4>
+                        <ul>
+                            {% for reason in analysis.reasons_not_met %}
+                            <li>{{ reason }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                <div class="chart-container">
+                    {{ analysis.chart_html | safe }}
+                </div>
+                <h3>📈 Indicators</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h4>RSI</h4>
+                        <p>{{ analysis.technical_indicators.rsi | round(2) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>EMA (20)</h4>
+                        <p>{{ analysis.technical_indicators.ema_short | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>ATR</h4>
+                        <p>{{ analysis.technical_indicators.atr | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>BB %B</h4>
+                        <p>{{ analysis.technical_indicators.bb_percent | round(2) }}%</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if gann_analyses %}
+        <div id="gann-results" class="results-section {% if not fibonacci_analyses and not elliott_analyses and not ichimoku_analyses and not wyckoff_analyses %}active{% endif %}">
+            <h2>Gann Results</h2>
+            {% for symbol, analysis in gann_analyses.items() %}
+            <div class="analysis-section">
+                <h2>{{ symbol }} ({{ analysis.interval }})</h2>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h3>Price</h3>
+                        <p class="current-price" data-symbol="{{ symbol }}" data-tool="gann" data-tool="gann">{{ analysis.current_price | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Trend</h3>
+                        <span class="trend-{{ analysis['trend'] if analysis['trend'] is defined else 'none' }}">{{ analysis['trend'].upper() if analysis['trend'] is defined else 'N/A' }}</span>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Confidence</h3>
+                        <span class="confidence-{{ analysis['confidence'] if analysis['confidence'] is defined else 'low' }}">
+                            {{ analysis['confidence'].upper() if analysis['confidence'] is defined else 'N/A' }}
+                        </span>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Pivot</h3>
+                        <p>{{ analysis.pivot_type if analysis.pivot_type is defined else 'N/A' }}</p>
+                    </div>
+                </div>
+                
+                <h3>📊 Gann Levels</h3>
+                <table class="pattern-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Support</td>
+                            <td>{{ analysis.nearest_support | round(4) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Resistance</td>
+                            <td>{{ analysis.nearest_resistance | round(4) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Price Position</td>
+                            <td>{{ analysis.price_position if analysis.price_position is defined else 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>📈 Gann Tools Analysis</h3>
+                {% if analysis.gann_analysis_details %}
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; width: 100%;">
+                        {% for tool_name, tool_data in analysis.gann_analysis_details.items() %}
+                        <div class="metric-card">
+                            <h4>{{ tool_name }}</h4>
+                            <p><strong>Description:</strong> {{ tool_data.description }}</p>
+                            <p><strong>Signal:</strong> 
+                                <span class="{% if tool_data.signal == 'Bullish' %}trend-uptrend{% elif tool_data.signal == 'Bearish' %}trend-downtrend{% else %}trend-sideways{% endif %}">
+                                    {{ tool_data.signal }}
+                                </span>
+                            </p>
+                            <p><strong>Strength:</strong> 
+                                <span class="{% if tool_data.strength == 'Strong' %}confidence-high{% elif tool_data.strength == 'Medium' %}confidence-medium{% else %}confidence-low{% endif %}">
+                                    {{ tool_data.strength }}
+                                </span>
+                            </p>
+                            {% if tool_data.key_levels %}
+                                <p><strong>Key Levels:</strong> {{ tool_data.key_levels }}</p>
+                            {% endif %}
+                            {% if tool_data.current_angle and tool_data.current_angle != 'N/A' %}
+                                <p><strong>Current Angle:</strong> {{ tool_data.current_angle }}</p>
+                            {% endif %}
+                            {% if tool_data.square_root %}
+                                <p><strong>Square Root:</strong> {{ tool_data.square_root | round(4) }}</p>
+                            {% endif %}
+                            {% if tool_data.box_top %}
+                                <p><strong>Box Top:</strong> {{ tool_data.box_top | round(4) }}</p>
+                                <p><strong>Box Bottom:</strong> {{ tool_data.box_bottom | round(4) }}</p>
+                            {% endif %}
+                            {% if tool_data.fixed_interval %}
+                                <p><strong>Fixed Interval:</strong> {{ tool_data.fixed_interval | round(4) }}</p>
+                            {% endif %}
+                            {% if tool_data.pivot_price and tool_data.pivot_price > 0 %}
+                                <p><strong>Pivot Price:</strong> {{ tool_data.pivot_price | round(4) }}</p>
+                            {% endif %}
+                            {% if tool_data.levels_count %}
+                                <p><strong>Levels Count:</strong> {{ tool_data.levels_count }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="info-box">No detailed Gann analysis available.</p>
+                {% endif %}
+                
+                <h3>📊 Gann Tools Charts</h3>
+                {% if analysis.subtools and analysis.subtools|length > 0 %}
+                    {% for tool in analysis.subtools %}
+                    <div class="chart-section">
+                        <h4>{{ tool }}</h4>
+                        {% if analysis.charts and analysis.charts[tool] %}
+                            <div class="chart-container">
+                                {{ analysis.charts[tool] | safe }}
+                            </div>
+                        {% else %}
+                            <p class="info-box">No chart available for {{ tool }}.</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="info-box">No Gann tools selected or available.</p>
+                {% endif %}
+                
+                <h3>📈 Indicators</h3>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; width: 100%;">
+                    <div class="metric-card">
+                        <h4>RSI</h4>
+                        <p>{{ analysis.technical_indicators.rsi | round(2) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>EMA (20)</h4>
+                        <p>{{ analysis.technical_indicators.ema | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>ATR</h4>
+                        <p>{{ analysis.technical_indicators.atr | round(4) }}</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>BB %B</h4>
+                        <p>{{ analysis.technical_indicators.bb_percent | round(2) }}%</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div id="gann-results" class="results-section">
+            <h2>Gann Results</h2>
+            <p class="no-results">No Gann analysis results available. Make sure Gann tool is selected and analysis completes successfully.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="trade-section">
+        <h2>Trades</h2>
+        <div class="trade-tabs">
+            <div class="trade-tab active" onclick="switchTradeTab('active')">Active</div>
+            <div class="trade-tab" onclick="switchTradeTab('history')">History</div>
+        </div>
+        
+        <!-- ACTIVE TRADES - Updated to include combined analysis -->
+        <!-- ACTIVE TRADES - Updated to include combined analysis -->
+        <div id="active-trades" class="trade-content active">
+            {% for tool in ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'] %}
+            {% if active_trades[tool] %}
+            <h3>{{ tool|capitalize }}</h3>
+                        <!-- In the ACTIVE TRADES section -->
+           <!-- In ACTIVE TRADES section -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        {% if tool == 'elliott' %}<th>Degree</th>{% endif %}
+                        <th>Action</th>
+                        <th>Entry</th>
+                        <th>Stop Loss</th>
+                        <th>Take Profit</th>
+                        <th>Position Size</th>
+                        <th>Invested ($)</th>
+                        <th>Entry Fee ($)</th>
+                        <th>Net Investment ($)</th>
+                        <th>Entry Time</th>
+                        <th>Interval</th>
+                    </tr>
+                </thead>
+                <tbody id="active-trades-tbody">
+                    {% for trade_key, trade in active_trades[tool].items() %}
+                    <tr class="active-trade" data-symbol="{{ trade.symbol }}" data-tool="{{ tool }}"
+                        {% if tool == 'elliott' %}data-degree="{{ trade.degree }}"{% endif %}
+                        data-action="{{ trade.action }}" 
+                        data-sl="{{ trade.stop_loss if trade.stop_loss else '' }}" 
+                        data-tp="{{ trade.take_profit if trade.take_profit else '' }}">
+                        <td>{{ trade.symbol }}</td>
+                        {% if tool == 'elliott' %}<td>{{ trade.degree }}</td>{% endif %}
+                        <td>{{ trade.action }}</td>
+                        <td>{{ trade.entry_price | round(4) if trade.entry_price else 'N/A' }}</td>
+                        <td>{{ trade.stop_loss | round(4) if trade.stop_loss else 'N/A' }}</td>
+                        <td>{{ trade.take_profit | round(4) if trade.take_profit else 'N/A' }}</td>
+                        <td>{{ trade.position_size | round(1) if trade.position_size else 'N/A' }}%</td>
+                        <td>${{ trade.invested_amount | round(2) if trade.invested_amount else 'N/A' }}</td>
+                        <td>${{ trade.entry_fee | round(2) if trade.entry_fee else 'N/A' }}</td>
+                        <td>${{ trade.net_investment | round(2) if trade.net_investment else 'N/A' }}</td>
+                        <td>{{ trade.entry_time }}</td>
+                        <td>{{ trade.interval }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No active {{ tool|capitalize }} trades.</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+        
+       <!-- HISTORY TRADES - Updated to include combined analysis -->
+        <div id="history-trades" class="trade-content">
+            {% for tool in ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'] %}
+            {% if trade_history[tool] %}
+            <h3>{{ tool|capitalize }}</h3>
+            <!-- In the HISTORY TRADES section -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        {% if tool == 'elliott' %}<th>Degree</th>{% endif %}
+                        <th>Action</th>
+                        <th>Entry</th>
+                        <th>Close</th>
+                        <th>Gross Profit %</th>
+                        <th>Net Profit %</th>
+                        <th>Net Profit ($)</th>
+                        <th>Gross Profit ($)</th>
+                        <th>Position Size</th>
+                        <th>Invested ($)</th>
+                        <th>Total Fees ($)</th>
+                        <th>Outcome</th>
+                        <th>Entry Time</th>
+                        <th>Close Time</th>
+                        <th>Interval</th>
+                    </tr>
+                </thead>
+                <tbody id="history-trades-tbody">
+                    {% for trade in trade_history[tool] %}
+                    <tr>
+                        <td>{{ trade.symbol }}</td>
+                        {% if tool == 'elliott' %}<td>{{ trade.degree }}</td>{% endif %}
+                        <td>{{ trade.action }}</td>
+                        <td>{{ trade.entry_price | round(4) if trade.entry_price else 'N/A' }}</td>
+                        <td>{{ trade.close_price | round(4) if trade.close_price else 'N/A' }}</td>
+                        <td class="{% if trade.profit_pct > 0 %}trend-uptrend{% elif trade.profit_pct < 0 %}trend-downtrend{% endif %}">
+                            {{ trade.profit_pct | round(2) if trade.profit_pct is defined else 'N/A' }}%
+                        </td>
+                        <td class="{% if trade.net_profit_pct > 0 %}trend-uptrend{% elif trade.net_profit_pct < 0 %}trend-downtrend{% endif %}">
+                            {{ trade.net_profit_pct | round(2) if trade.net_profit_pct is defined else 'N/A' }}%
+                        </td>
+                        <td class="{% if trade.net_profit_usd > 0 %}trend-uptrend{% elif trade.net_profit_usd < 0 %}trend-downtrend{% endif %}">
+                            ${{ trade.net_profit_usd | round(2) if trade.net_profit_usd is defined else 'N/A' }}
+                        </td>
+                        <td class="{% if trade.gross_profit_usd > 0 %}trend-uptrend{% elif trade.gross_profit_usd < 0 %}trend-downtrend{% endif %}">
+                            ${{ trade.gross_profit_usd | round(2) if trade.gross_profit_usd is defined else 'N/A' }}
+                        </td>
+                        <td>{{ trade.position_size | round(1) if trade.position_size else 'N/A' }}%</td>
+                        <td>${{ trade.invested_amount | round(2) if trade.invested_amount else 'N/A' }}</td>
+                        <td>${{ trade.total_fees | round(2) if trade.total_fees is defined else 'N/A' }}</td>
+                        <td>{{ trade.outcome }}</td>
+                        <td>{{ trade.entry_time }}</td>
+                        <td>{{ trade.close_time }}</td>
+                        <td>{{ trade.interval }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No {{ tool|capitalize }} trade history.</p>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- STATISTICS - Updated to include combined analysis -->
+    <div class="trade-section">
+        <h2>Statistics</h2>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.6rem; width: 100%;">
+            <div class="metric-card">
+                <h3>Fibonacci</h3>
+                <p>Wins: <span id="fibonacci_wins">{{ fibonacci_wins }}</span></p>
+                <p>Losses: <span id="fibonacci_losses">{{ fibonacci_losses }}</span></p>
+                <p>Win Rate: <span id="fibonacci_win_rate">{{ (fibonacci_wins / (fibonacci_wins + fibonacci_losses) * 100) | round(2) if fibonacci_wins + fibonacci_losses > 0 else 0 }}</span>%</p>
+            </div>
+            <div class="metric-card">
+                <h3>Elliott Wave</h3>
+                <p>Wins: <span id="elliott_wins">{{ elliott_wins }}</span></p>
+                <p>Losses: <span id="elliott_losses">{{ elliott_losses }}</span></p>
+                <p>Win Rate: <span id="elliott_win_rate">{{ (elliott_wins / (elliott_wins + elliott_losses) * 100) | round(2) if elliott_wins + elliott_losses > 0 else 0 }}</span>%</p>
+            </div>
+            <div class="metric-card">
+                <h3>Ichimoku</h3>
+                <p>Wins: <span id="ichimoku_wins">{{ ichimoku_wins }}</span></p>
+                <p>Losses: <span id="ichimoku_losses">{{ ichimoku_losses }}</span></p>
+                <p>Win Rate: <span id="ichimoku_win_rate">{{ (ichimoku_wins / (ichimoku_wins + ichimoku_losses) * 100) | round(2) if ichimoku_wins + ichimoku_losses > 0 else 0 }}</span>%</p>
+            </div>
+            <div class="metric-card">
+                <h3>Wyckoff</h3>
+                <p>Wins: <span id="wyckoff_wins">{{ wyckoff_wins }}</span></p>
+                <p>Losses: <span id="wyckoff_losses">{{ wyckoff_losses }}</span></p>
+                <p>Win Rate: <span id="wyckoff_win_rate">{{ (wyckoff_wins / (wyckoff_wins + wyckoff_losses) * 100) | round(2) if wyckoff_wins + wyckoff_losses > 0 else 0 }}</span>%</p>
+            </div>
+            <div class="metric-card">
+                <h3>Combined</h3>
+                <p>Wins: <span id="combined_wins">{{ combined_wins }}</span></p>
+                <p>Losses: <span id="combined_losses">{{ combined_losses }}</span></p>
+                <p>Win Rate: <span id="combined_win_rate">{{ (combined_wins / (combined_wins + combined_losses) * 100) | round(2) if combined_wins + combined_losses > 0 else 0 }}</span>%</p>
+            </div>
+        </div>
+    </div>
+        <!-- Profit/Loss Summary - Updated with safe access -->
+    <div class="trade-section">
+        <h2>Profit/Loss Summary</h2>
+        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.6rem; width: 100%;">
+            <div class="metric-card">
+                <h3>Total Net Profit</h3>
+                <p>$<span id="total_net_profit">
+                    {% set total_net = [] %}
+                    {% for tool in ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'] %}
+                        {% for trade in trade_history[tool] %}
+                            {% if trade.net_profit_usd is defined %}
+                                {% set _ = total_net.append(trade.net_profit_usd) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {{ "%.2f"|format(total_net | sum) }}
+                </span></p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Gross Profit</h3>
+                <p>$<span id="total_gross_profit">
+                    {% set total_gross = [] %}
+                    {% for tool in ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'] %}
+                        {% for trade in trade_history[tool] %}
+                            {% if trade.gross_profit_usd is defined %}
+                                {% set _ = total_gross.append(trade.gross_profit_usd) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {{ "%.2f"|format(total_gross | sum) }}
+                </span></p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Fees Paid</h3>
+                <p>$<span id="total_fees_summary">{{ "%.2f"|format(budget.get('total_fees', 0.0)) }}</span></p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Invested</h3>
+                <p>$<span id="total_invested_summary">{{ "%.2f"|format(budget.get('total_invested', 0.0)) }}</span></p>
+            </div>
+            <div class="metric-card">
+                <h3>Net ROI</h3>
+                <p>
+                    {% set total_net_profit = [] %}
+                    {% for tool in ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'] %}
+                        {% for trade in trade_history[tool] %}
+                            {% if trade.net_profit_usd is defined %}
+                                {% set _ = total_net_profit.append(trade.net_profit_usd) %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                    {% set total_invested = budget.get('total_invested', 1.0) %}
+                    {% set net_roi = ( (total_net_profit | sum) / total_invested * 100 ) if total_invested > 0 else 0 %}
+                    <span id="net_roi" class="{% if net_roi > 0 %}trend-uptrend{% elif net_roi < 0 %}trend-downtrend{% endif %}">
+                        {{ "%.2f"|format(net_roi) }}%
+                    </span>
+                </p>
+            </div>
+            <div class="metric-card">
+                <h3>Current Equity</h3>
+                <p>$<span id="current_equity">
+                    {{ "%.2f"|format(budget.get('total_budget', 5000.0)) }}
+                </span></p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Trades</h3>
+                <p><span id="total_trades">
+                    {% set total_trades = 0 %}
+                    {% for tool in ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'] %}
+                        {% set total_trades = total_trades + trade_history[tool]|length %}
+                    {% endfor %}
+                    {{ total_trades }}
+                </span></p>
+            </div>
+            <div class="metric-card">
+                <h3>Overall Win Rate</h3>
+                <p><span id="win_rate">{{ ( (fibonacci_wins + elliott_wins + ichimoku_wins + wyckoff_wins + combined_wins) / total_trades * 100 ) | round(2) if total_trades > 0 else 0 }}</span>%</p>
+            </div>
+        </div>
+    </div>
+        <!-- Add this section after the Statistics section, before the script -->
+    <!-- Add this section after the Statistics section, before the script -->
+    <div class="trade-section">
+        <h2>Database Management</h2>
+       <!-- Add after the refresh button -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 75%; margin: 1rem auto;">
+                <button onclick="downloadDatabase()" style="background-color: #06d6a0;">
+                    💾 Download All Data (JSON)
+                </button>
+                <button onclick="deleteAllData()" style="background-color: #ef476f;">
+                    🗑️ Delete All Data
+                </button>
+            </div>
+    </div>
+
+    <script>
+        function downloadDatabase() {
+            if (confirm('Download all database data as JSON file?')) {
+                window.location.href = '/download_db';
+                console.log('✅ Database download initiated');
+            }
+        }
+
+        function deleteAllData() {
+            const confirmation = prompt(
+                '⚠️ WARNING: This will DELETE ALL DATA!\n\n' +
+                'This includes:\n' +
+                '- All active trades\n' +
+                '- Trade history\n' +
+                '- Budget settings\n' +
+                '- Analysis configurations\n\n' +
+                'Type "DELETE ALL" to confirm:'
+            );
+            
+            if (confirmation === 'DELETE ALL') {
+                fetch('/delete_all_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('✅ ' + data.message);
+                        location.reload();
+                    } else {
+                        alert('❌ Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error deleting data:', error);
+                    alert('Error deleting data. Check console for details.');
+                });
+            } else if (confirmation !== null) {
+                alert('❌ Deletion cancelled. You must type "DELETE ALL" exactly.');
+            }
+        }
+
+        function switchResultsTab(section) {
+            document.querySelectorAll('.results-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`${section}-results`).classList.add('active');
+            document.querySelector(`.tab[onclick="switchResultsTab('${section}')"]`).classList.add('active');
+        }
+
+        function switchTradeTab(section) {
+            document.querySelectorAll('.trade-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.trade-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`${section}-trades`).classList.add('active');
+            document.querySelector(`.trade-tab[onclick="switchTradeTab('${section}')"]`).classList.add('active');
+        }
+
+        document.querySelectorAll('.tool-checkbox input').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const tool = checkbox.value;
+                const details = document.getElementById(`${tool}-form`).parentElement;
+                details.style.display = checkbox.checked ? 'block' : 'none';
+            });
+        });
+
+        document.getElementById('use_smoothing').addEventListener('change', () => {
+            document.getElementById('smooth-period-container').style.display = document.getElementById('use_smoothing').checked ? 'block' : 'none';
+        });
+
+        // Add these JavaScript functions
+        function updateBudget() {
+            const totalBudget = parseFloat(document.getElementById('total_budget').value);
+            
+            fetch('/update_budget', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ total_budget: totalBudget })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('total_budget_display').textContent = data.budget.total_budget.toFixed(2);
+                    document.getElementById('used_budget_display').textContent = data.budget.used_budget.toFixed(2);
+                    document.getElementById('remaining_budget_display').textContent = data.budget.remaining_budget.toFixed(2);
+                    alert('Budget updated successfully!');
+                } else {
+                    alert('Error updating budget: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating budget:', error);
+                alert('Error updating budget');
+            });
+        }
+
+        // Update budget display on page load and auto-refresh
+        function updateBudgetDisplay() {
+                    fetch('/auto_refresh_status') // Reuse existing endpoint or create a budget status endpoint
+                    .then(response => response.json())
+                    .then(data => {
+                        // This will be updated when we add budget to the auto_refresh_status response
+                    });
+                }
+
+                // Call this on page load
+                document.addEventListener('DOMContentLoaded', function() {
+                    updateBudgetDisplay();
+                });
+
+            // In your frontend JavaScript - update ALL sections
+            function refreshAllData() {
+                fetch('/refresh_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update budget section
+                        updateBudget(data.budget);
+                        
+                        // Update active trades section  
+                        updateActiveTrades(data.active_trades);
+                        
+                        // Update trade history section
+                        updateTradeHistory(data.trade_history);
+                        
+                        // Update statistics section
+                        updateStatistics(data.statistics);
+                        
+                        // Update profit/loss summary
+                        updateProfitLossSummary(data.statistics, data.budget);
+                        
+                        console.log('✅ All data refreshed successfully');
+                    } else {
+                        console.error('❌ Refresh failed:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Refresh error:', error);
+                });
+            }
+
+            function updateBudget(budget) {
+                document.getElementById('total_budget_display').textContent = budget.total_budget.toFixed(2);
+                document.getElementById('used_budget_display').textContent = budget.used_budget.toFixed(2);
+                document.getElementById('remaining_budget_display').textContent = budget.remaining_budget.toFixed(2);
+                document.getElementById('total_fees_display').textContent = budget.total_fees.toFixed(2);
+                document.getElementById('total_invested_summary').textContent = budget.total_invested.toFixed(2);
+                document.getElementById('current_equity').textContent = budget.total_budget.toFixed(2);
+            }
+
+            function updateActiveTrades(activeTrades) {
+                const activeDiv = document.getElementById('active-trades');
+                let html = '';
+                const tools = ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'];
+                let hasTrades = false;
+                
+                tools.forEach(tool => {
+                    const trades = activeTrades[tool] || {};
+                    const tradeKeys = Object.keys(trades);
+                    if (tradeKeys.length > 0) {
+                        hasTrades = true;
+                        html += `<h3>${tool.charAt(0).toUpperCase() + tool.slice(1)}</h3>`;
+                        html += `<table>
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    ${tool === 'elliott' ? '<th>Degree</th>' : ''}
+                                    <th>Action</th>
+                                    <th>Entry</th>
+                                    <th>Stop Loss</th>
+                                    <th>Take Profit</th>
+                                    <th>Position Size</th>
+                                    <th>Invested ($)</th>
+                                    <th>Entry Fee ($)</th>
+                                    <th>Net Investment ($)</th>
+                                    <th>Entry Time</th>
+                                    <th>Interval</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                        
+                        tradeKeys.forEach(tradeKey => {
+                            const trade = trades[tradeKey];
+                            const degreeTd = tool === 'elliott' ? `<td>${trade.degree || 'N/A'}</td>` : '';
+                            html += `<tr class="active-trade" data-symbol="${trade.symbol}" data-tool="${tool}" 
+                                ${tool === 'elliott' ? `data-degree="${trade.degree || ''}"` : ''} data-action="${trade.action}" 
+                                data-sl="${trade.stop_loss || ''}" data-tp="${trade.take_profit || ''}">
+                                <td>${trade.symbol}</td>
+                                ${degreeTd}
+                                <td>${trade.action}</td>
+                                <td>${(trade.entry_price || 0).toFixed(4)}</td>
+                                <td>${(trade.stop_loss || 0).toFixed(4)}</td>
+                                <td>${(trade.take_profit || 0).toFixed(4)}</td>
+                                <td>${(trade.position_size || 0).toFixed(1)}%</td>
+                                <td>$${(trade.invested_amount || 0).toFixed(2)}</td>
+                                <td>$${(trade.entry_fee || 0).toFixed(2)}</td>
+                                <td>$${(trade.net_investment || 0).toFixed(2)}</td>
+                                <td>${trade.entry_time}</td>
+                                <td>${trade.interval || 'N/A'}</td>
+                            </tr>`;
+                        });
+                        
+                        html += `</tbody></table>`;
+                    }
+                });
+                
+                activeDiv.innerHTML = hasTrades ? html : '<p>No active trades across all tools.</p>';
+            }
+
+            function updateTradeHistory(tradeHistory) {
+                const historyDiv = document.getElementById('history-trades');
+                let html = '';
+                const tools = ['fibonacci', 'elliott', 'ichimoku', 'wyckoff', 'combined'];
+                let hasHistory = false;
+                
+                tools.forEach(tool => {
+                    const trades = tradeHistory[tool] || [];
+                    if (trades.length > 0) {
+                        hasHistory = true;
+                        html += `<h3>${tool.charAt(0).toUpperCase() + tool.slice(1)}</h3>`;
+                        html += `<table>
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    ${tool === 'elliott' ? '<th>Degree</th>' : ''}
+                                    <th>Action</th>
+                                    <th>Entry</th>
+                                    <th>Close</th>
+                                    <th>Gross Profit %</th>
+                                    <th>Net Profit %</th>
+                                    <th>Net Profit ($)</th>
+                                    <th>Gross Profit ($)</th>
+                                    <th>Position Size</th>
+                                    <th>Invested ($)</th>
+                                    <th>Total Fees ($)</th>
+                                    <th>Outcome</th>
+                                    <th>Entry Time</th>
+                                    <th>Close Time</th>
+                                    <th>Interval</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                        
+                        trades.forEach(trade => {
+                            const degreeTd = tool === 'elliott' ? `<td>${trade.degree || 'N/A'}</td>` : '';
+                            const grossProfitClass = trade.gross_profit_usd > 0 ? 'trend-uptrend' : (trade.gross_profit_usd < 0 ? 'trend-downtrend' : '');
+                            const netProfitClass = trade.net_profit_usd > 0 ? 'trend-uptrend' : (trade.net_profit_usd < 0 ? 'trend-downtrend' : '');
+                            const grossPctClass = trade.profit_pct > 0 ? 'trend-uptrend' : (trade.profit_pct < 0 ? 'trend-downtrend' : '');
+                            const netPctClass = trade.net_profit_pct > 0 ? 'trend-uptrend' : (trade.net_profit_pct < 0 ? 'trend-downtrend' : '');
+                            
+                            html += `<tr>
+                                <td>${trade.symbol}</td>
+                                ${degreeTd}
+                                <td>${trade.action}</td>
+                                <td>${(trade.entry_price || 0).toFixed(4)}</td>
+                                <td>${(trade.close_price || 0).toFixed(4)}</td>
+                                <td class="${grossPctClass}">${(trade.profit_pct || 0).toFixed(2)}%</td>
+                                <td class="${netPctClass}">${(trade.net_profit_pct || 0).toFixed(2)}%</td>
+                                <td class="${netProfitClass}">$${(trade.net_profit_usd || 0).toFixed(2)}</td>
+                                <td class="${grossProfitClass}">$${(trade.gross_profit_usd || 0).toFixed(2)}</td>
+                                <td>${(trade.position_size || 0).toFixed(1)}%</td>
+                                <td>$${(trade.invested_amount || 0).toFixed(2)}</td>
+                                <td>$${(trade.total_fees || 0).toFixed(2)}</td>
+                                <td>${trade.outcome}</td>
+                                <td>${trade.entry_time}</td>
+                                <td>${trade.close_time}</td>
+                                <td>${trade.interval || 'N/A'}</td>
+                            </tr>`;
+                        });
+                        
+                        html += `</tbody></table>`;
+                    }
+                });
+                
+                historyDiv.innerHTML = hasHistory ? html : '<p>No trade history across all tools.</p>';
+            }
+
+            function updateStatistics(statistics) {
+                // Fibonacci
+                document.getElementById('fibonacci_wins').textContent = statistics.fibonacci_wins;
+                document.getElementById('fibonacci_losses').textContent = statistics.fibonacci_losses;
+                const fib_total = statistics.fibonacci_wins + statistics.fibonacci_losses;
+                const fib_win_rate = fib_total > 0 ? ((statistics.fibonacci_wins / fib_total) * 100).toFixed(2) : '0.00';
+                document.getElementById('fibonacci_win_rate').textContent = fib_win_rate;
+                
+                // Elliott
+                document.getElementById('elliott_wins').textContent = statistics.elliott_wins;
+                document.getElementById('elliott_losses').textContent = statistics.elliott_losses;
+                const elliott_total = statistics.elliott_wins + statistics.elliott_losses;
+                const elliott_win_rate = elliott_total > 0 ? ((statistics.elliott_wins / elliott_total) * 100).toFixed(2) : '0.00';
+                document.getElementById('elliott_win_rate').textContent = elliott_win_rate;
+                
+                // Ichimoku
+                document.getElementById('ichimoku_wins').textContent = statistics.ichimoku_wins;
+                document.getElementById('ichimoku_losses').textContent = statistics.ichimoku_losses;
+                const ichimoku_total = statistics.ichimoku_wins + statistics.ichimoku_losses;
+                const ichimoku_win_rate = ichimoku_total > 0 ? ((statistics.ichimoku_wins / ichimoku_total) * 100).toFixed(2) : '0.00';
+                document.getElementById('ichimoku_win_rate').textContent = ichimoku_win_rate;
+                
+                // Wyckoff
+                document.getElementById('wyckoff_wins').textContent = statistics.wyckoff_wins;
+                document.getElementById('wyckoff_losses').textContent = statistics.wyckoff_losses;
+                const wyckoff_total = statistics.wyckoff_wins + statistics.wyckoff_losses;
+                const wyckoff_win_rate = wyckoff_total > 0 ? ((statistics.wyckoff_wins / wyckoff_total) * 100).toFixed(2) : '0.00';
+                document.getElementById('wyckoff_win_rate').textContent = wyckoff_win_rate;
+                
+                // Combined
+                document.getElementById('combined_wins').textContent = statistics.combined_wins;
+                document.getElementById('combined_losses').textContent = statistics.combined_losses;
+                const combined_total = statistics.combined_wins + statistics.combined_losses;
+                const combined_win_rate = combined_total > 0 ? ((statistics.combined_wins / combined_total) * 100).toFixed(2) : '0.00';
+                document.getElementById('combined_win_rate').textContent = combined_win_rate;
+            }
+
+            function updateProfitLossSummary(statistics, budget) {
+                document.getElementById('total_net_profit').textContent = statistics.total_profit_loss.toFixed(2);
+                document.getElementById('total_gross_profit').textContent = statistics.total_gross_profit.toFixed(2);
+                document.getElementById('total_fees_summary').textContent = statistics.total_fees.toFixed(2);
+                document.getElementById('total_invested_summary').textContent = statistics.total_invested.toFixed(2);
+                document.getElementById('total_trades').textContent = statistics.total_trades;
+                document.getElementById('win_rate').textContent = statistics.win_rate.toFixed(2);
+                
+                // Update Net ROI
+                const total_invested = statistics.total_invested > 0 ? statistics.total_invested : 1;
+                const net_roi = ((statistics.total_profit_loss / total_invested) * 100).toFixed(2);
+                const netRoiSpan = document.getElementById('net_roi');
+                netRoiSpan.textContent = net_roi;
+                netRoiSpan.classList.remove('trend-uptrend', 'trend-downtrend');
+                if (parseFloat(net_roi) > 0) {
+                    netRoiSpan.classList.add('trend-uptrend');
+                } else if (parseFloat(net_roi) < 0) {
+                    netRoiSpan.classList.add('trend-downtrend');
+                }
+            }
+
+        function startAutoRefresh() {
+            const priceElements = document.querySelectorAll('.current-price');
+            const symbols = new Set([...priceElements].map(el => el.dataset.symbol));
+            
+            // Add symbols from active trades
+            const tradeElements = document.querySelectorAll('.active-trade');
+            [...tradeElements].forEach(el => symbols.add(el.dataset.symbol));
+            
+            symbols.forEach(symbol => {
+                fetch(`/refresh_price/${symbol}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error(`Error fetching price for ${symbol}: ${data.error}`);
+                            return;
+                        }
+                        const newPrice = parseFloat(data.price);
+                        document.querySelectorAll(`.current-price[data-symbol="${symbol}"]`).forEach(el => {
+                            el.textContent = newPrice.toFixed(4);
+                        });
+                        document.querySelectorAll(`.active-trade[data-symbol="${symbol}"]`).forEach(tradeRow => {
+                            const tool = tradeRow.dataset.tool;
+                            const degree = tradeRow.dataset.degree || null;
+                            const action = tradeRow.dataset.action;
+                            const stopLoss = parseFloat(tradeRow.dataset.sl) || null;
+                            const takeProfit = parseFloat(tradeRow.dataset.tp) || null;
+                            
+                            // Skip if stop loss or take profit is not set
+                            if (!stopLoss || !takeProfit) return;
+                            
+                            let hitSL = false;
+                            let hitTP = false;
+                            if (action === 'BUY') {
+                                hitSL = newPrice <= stopLoss;
+                                hitTP = newPrice >= takeProfit;
+                            } else if (action === 'SELL') {
+                                hitSL = newPrice >= stopLoss;
+                                hitTP = newPrice <= takeProfit;
+                            }
+                            if (hitSL || hitTP) {
+                                const outcome = hitTP ? 'win' : 'loss';
+                                fetch('/close_trade', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        tool: tool,
+                                        symbol: symbol,
+                                        degree: degree,
+                                        close_price: newPrice,
+                                        outcome: outcome
+                                    })
+                                })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.status === 'success') {
+                                            console.log(`${tool} trade closed for ${symbol}${degree ? ` (${degree})` : ''}: ${outcome}`);
+                                            location.reload();
+                                        } else {
+                                            console.error(`Error closing trade: ${data.message}`);
+                                        }
+                                    })
+                                    .catch(error => console.error(`Error closing trade: ${error}`));
+                            }
+                        });
+                    })
+                    .catch(error => console.error(`Error fetching price for ${symbol}: ${error}`));
+            });
+            location.reload();
+        }
+
+        // Force charts to resize to full width
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 1000);
+    </script>
+</body>
+</html>
