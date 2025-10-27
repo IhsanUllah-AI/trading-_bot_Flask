@@ -572,7 +572,7 @@
                 
                 
                 <!-- Budget Status Display -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.6rem; width: 100%; margin-top: 0.6rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; width: 100%; margin-top: 0.6rem;">
                     <div class="metric-card">
                         <h4>Total Budget</h4>
                         <p>$<span id="total_budget_display">{{ "%.2f"|format(budget.get('total_budget', 5000.0)) }}</span></p>
@@ -584,10 +584,6 @@
                     <div class="metric-card">
                         <h4>Remaining</h4>
                         <p>$<span id="remaining_budget_display">{{ "%.2f"|format(budget.get('remaining_budget', 5000.0)) }}</span></p>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Total Fees</h4>
-                        <p>$<span id="total_fees_display">{{ "%.2f"|format(budget.get('total_fees', 0.0)) }}</span></p>
                     </div>
                 </div>
             </div>
